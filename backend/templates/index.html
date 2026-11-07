@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RouteMate</title>
+    <style>
+        body { font-family: Arial; margin: 30px; }
+        input, button { padding: 8px; margin: 5px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid gray; padding: 10px; }
+    </style>
+</head>
+<body>
+
+<h1>RouteMate</h1>
+<p>Bus Reservation System</p>
+
+<a href="/">Home</a> |
+<a href="/my-bookings">My Bookings</a>
+
+<hr>
+
+{% for message in get_flashed_messages() %}
+    <p><b>{{ message }}</b></p>
+{% endfor %}
+
+<h2>Search Buses</h2>
+
+<form action="/" method="GET">
+    <input type="hidden" name="search" value="1">
+
+    <input type="text" name="source"
+           placeholder="Source" value="{{ source }}" required>
+
+    <input type="text" name="destination"
+           placeholder="Destination"
+           value="{{ destination }}" required>
+
+    <input type="date" name="date"
+           value="{{ travel_date }}" required>
+
+    <button type="submit">Search Buses</button>
+</form>
+
+{% if searched %}
+
+<h2>Available Buses</h2>
+
+{% if trips %}
+
+<table>
+    <tr>
+        <th>Bus Number</th>
+        <th>Source</th>
+        <th>Destination</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Fare</th>
+        <th>Action</th>
+    </tr>
+
+    {% for trip in trips %}
+    <tr>
+        <td>{{ trip[1] }}</td>
+        <td>{{ trip[3] }}</td>
+        <td>{{ trip[4] }}</td>
+        <td>{{ trip[5] }}</td>
+        <td>{{ trip[6] }}</td>
+        <td>Rs. {{ trip[7] }}</td>
+        <td>
+            <a href="{{ url_for('book', trip_id=trip[0]) }}">
+                <button>Select Bus</button>
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% else %}
+<p>No buses found for this search.</p>
+{% endif %}
+
+{% endif %}
+
+</body>
+</html>

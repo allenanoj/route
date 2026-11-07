@@ -1,0 +1,102 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Bookings - RouteMate</title>
+    <style>
+        body { font-family: Arial; margin: 30px; }
+        input, button { padding: 8px; margin: 5px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid gray; padding: 10px; }
+    </style>
+</head>
+<body>
+
+<h1>RouteMate</h1>
+
+<a href="/">Home</a> |
+<a href="/my-bookings">My Bookings</a>
+
+<hr>
+
+<h2>My Bookings</h2>
+
+{% for message in get_flashed_messages() %}
+    <p><b>{{ message }}</b></p>
+{% endfor %}
+
+<form method="POST">
+
+    <input type="text" name="name"
+           placeholder="Passenger Name"
+           value="{{ name }}" required>
+
+    <input type="text" name="contact"
+           placeholder="Phone Number or Email"
+           value="{{ contact }}" required>
+
+    <button type="submit">View Bookings</button>
+
+</form>
+
+{% if searched %}
+
+<h2>Booking History</h2>
+
+{% if bookings %}
+
+<table>
+    <tr>
+        <th>Booking ID</th>
+        <th>Name</th>
+        <th>Bus</th>
+        <th>Route</th>
+        <th>Date</th>
+        <th>Seat</th>
+        <th>Status</th>
+        <th>Action</th>
+    </tr>
+
+    {% for booking in bookings %}
+    <tr>
+        <td>{{ booking[0] }}</td>
+        <td>{{ booking[1] }}</td>
+        <td>{{ booking[2] }}</td>
+        <td>{{ booking[3] }} to {{ booking[4] }}</td>
+        <td>{{ booking[5] }}</td>
+        <td>{{ booking[6] }}</td>
+        <td>{{ booking[7] }}</td>
+
+        <td>
+            {% if booking[7] == 'BOOKED' %}
+            <form method="POST">
+
+                <input type="hidden" name="action"
+                       value="cancel">
+
+                <input type="hidden" name="booking_id"
+                       value="{{ booking[0] }}">
+
+                <input type="hidden" name="name"
+                       value="{{ name }}">
+
+                <input type="hidden" name="contact"
+                       value="{{ contact }}">
+
+                <button type="submit">Cancel</button>
+            </form>
+            {% endif %}
+        </td>
+
+    </tr>
+    {% endfor %}
+</table>
+
+{% else %}
+<p>No bookings found.</p>
+{% endif %}
+
+{% endif %}
+
+</body>
+</html>

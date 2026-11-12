@@ -1,102 +1,54 @@
+{% extends "base.html" %}
+{% block title %}My bookings — RouteMate{% endblock %}
+{% block content %}
+<section class="page-banner">
+  <div class="container"><div class="breadcrumb"><a href="{{ url_for('home') }}">Find a bus</a><span>›</span>My bookings</div><span class="kicker">ALL YOUR JOURNEYS IN ONE PLACE</span><h1>Your trips, sorted.</h1><p>View your reservations, check details and stay in control of your travel plans.</p></div>
+</section>
+<div class="container my-bookings-layout">
+  <section class="surface lookup-panel" aria-labelledby="lookup-heading">
+    <div class="lookup-title"><div class="lookup-icon" aria-hidden="true">▤</div><div><h2 id="lookup-heading">Find your bookings</h2><p>Enter the name and contact used for your reservation.</p></div></div>
+    <form method="POST" class="lookup-form">
+      <label class="input-group">Passenger name<input type="text" name="name" value="{{ name }}" placeholder="Your full name" autocomplete="name" required></label>
+      <label class="input-group">Phone number or email<input type="text" name="contact" value="{{ contact }}" placeholder="Your booking contact" required></label>
+      <button class="primary-button" type="submit">Find bookings <span aria-hidden="true">→</span></button>
+    </form>
+  </section>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>My Bookings - RouteMate</title>
-    <style>
-        body { font-family: Arial; margin: 30px; }
-        input, button { padding: 8px; margin: 5px; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid gray; padding: 10px; }
-    </style>
-</head>
-<body>
-
-<h1>RouteMate</h1>
-
-<a href="/">Home</a> |
-<a href="/my-bookings">My Bookings</a>
-
-<hr>
-
-<h2>My Bookings</h2>
-
-{% for message in get_flashed_messages() %}
-    <p><b>{{ message }}</b></p>
-{% endfor %}
-
-<form method="POST">
-
-    <input type="text" name="name"
-           placeholder="Passenger Name"
-           value="{{ name }}" required>
-
-    <input type="text" name="contact"
-           placeholder="Phone Number or Email"
-           value="{{ contact }}" required>
-
-    <button type="submit">View Bookings</button>
-
-</form>
-
-{% if searched %}
-
-<h2>Booking History</h2>
-
-{% if bookings %}
-
-<table>
-    <tr>
-        <th>Booking ID</th>
-        <th>Name</th>
-        <th>Bus</th>
-        <th>Route</th>
-        <th>Date</th>
-        <th>Seat</th>
-        <th>Status</th>
-        <th>Action</th>
-    </tr>
-
-    {% for booking in bookings %}
-    <tr>
-        <td>{{ booking[0] }}</td>
-        <td>{{ booking[1] }}</td>
-        <td>{{ booking[2] }}</td>
-        <td>{{ booking[3] }} to {{ booking[4] }}</td>
-        <td>{{ booking[5] }}</td>
-        <td>{{ booking[6] }}</td>
-        <td>{{ booking[7] }}</td>
-
-        <td>
-            {% if booking[7] == 'BOOKED' %}
-            <form method="POST">
-
-                <input type="hidden" name="action"
-                       value="cancel">
-
-                <input type="hidden" name="booking_id"
-                       value="{{ booking[0] }}">
-
-                <input type="hidden" name="name"
-                       value="{{ name }}">
-
-                <input type="hidden" name="contact"
-                       value="{{ contact }}">
-
-                <button type="submit">Cancel</button>
+  {% if searched %}
+  <section class="booking-history">
+    <div class="section-heading"><div><span class="kicker">YOUR RESERVATIONS</span><h2>Booking history <span class="count">{{ bookings|length }}</span></h2></div></div>
+    {% if bookings %}
+    <div class="history-list">
+      {% for booking in bookings %}
+      <article class="history-card">
+        <div class="history-top"><span>BOOKING #{{ booking[0] }}</span><span class="status {% if booking[7] == 'BOOKED' %}status-booked{% else %}status-cancelled{% endif %}"><i></i>{{ booking[7] }}</span></div>
+        <div class="history-grid">
+          <div class="history-route"><small>YOUR ROUTE</small><h3>{{ booking[3] }} <span>→</span> {{ booking[4] }}</h3><p>{{ booking[2] }}</p></div>
+          <div><small>TRAVEL DATE</small><strong>{{ booking[5] }}</strong></div>
+          <div><small>SEAT</small><strong>{{ booking[6] }}</strong></div>
+          <div class="history-action">
+          {% if booking[7] == 'BOOKED' %}
+            <form method="POST" data-confirm-cancel>
+              <input type="hidden" name="action" value="cancel">
+              <input type="hidden" name="booking_id" value="{{ booking[0] }}">
+              <input type="hidden" name="name" value="{{ name }}">
+              <input type="hidden" name="contact" value="{{ contact }}">
+              <button type="submit" class="cancel-button">Cancel booking</button>
             </form>
-            {% endif %}
-        </td>
-
-    </tr>
-    {% endfor %}
-</table>
-
-{% else %}
-<p>No bookings found.</p>
-{% endif %}
-
-{% endif %}
-
-</body>
-</html>
+          {% else %}
+            <span class="no-action">No action needed</span>
+          {% endif %}
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state"><div class="empty-art" aria-hidden="true">⌕</div><h3>No bookings found</h3><p>Double-check your name and phone number or email, then try again.</p></div>
+    {% endif %}
+  </section>
+  {% else %}
+  <div class="helper-strip"><span>✦</span><div><h3>Have a trip coming up?</h3><p>Your active and past reservations will appear here once you find your bookings.</p></div></div>
+  {% endif %}
+</div>
+{% endblock %}

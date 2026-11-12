@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#131b35">
+  <meta name="description" content="Find bus journeys, choose a seat and manage your reservations with RouteMate.">
+  <title>{% block title %}RouteMate{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+</head>
+<body>
+<div class="site">
+  <header class="header">
+    <div class="container navbar">
+      <a class="logo" href="{{ url_for('home') }}" aria-label="RouteMate home">
+        <span class="logo-symbol" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="3" width="16" height="16" rx="4"/><path d="M4 12h16M8 19v2m8-2v2M8 8h2m4 0h2"/></svg></span>
+        <span>route<span class="logo-light">mate</span><span class="logo-dot">.</span></span>
+      </a>
+      <nav class="navigation" aria-label="Main navigation">
+        <a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}" {% if request.endpoint == 'home' %}aria-current="page"{% endif %}>Find a bus</a>
+        <a href="{{ url_for('my_bookings') }}" class="{% if request.endpoint == 'my_bookings' %}active{% endif %}" {% if request.endpoint == 'my_bookings' %}aria-current="page"{% endif %}>My bookings</a>
+      </nav>
+      <a class="nav-action" href="{{ url_for('my_bookings') }}">Manage booking <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+  <div class="container alerts" role="status" aria-live="polite">
+    {% for message in messages %}<div class="alert"><span aria-hidden="true">ⓘ</span> {{ message }}</div>{% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+
+  <main class="main">{% block content %}{% endblock %}</main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div><div class="footer-logo">routemate<span>.</span></div><p>Less planning. More going places.</p></div>
+      <div class="footer-links"><a href="{{ url_for('home') }}">Find a bus</a><a href="{{ url_for('my_bookings') }}">My bookings</a><span>© RouteMate</span></div>
+    </div>
+  </footer>
+</div>
+</body>
+</html>

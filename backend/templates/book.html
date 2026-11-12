@@ -1,72 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Choose your seat — RouteMate{% endblock %}
+{% block content %}
+<section class="page-banner">
+  <div class="container"><div class="breadcrumb"><a href="{{ url_for('home') }}">Find a bus</a><span>›</span>Choose your seat</div><span class="kicker">YOU'RE ALMOST THERE</span><h1>Make it your ride.</h1><p>A great journey deserves a great seat. Choose yours and finish your booking.</p></div>
+</section>
+<div class="container booking-layout">
+  <section class="surface booking-panel" aria-labelledby="seat-heading">
+    <div class="step-heading"><div><span class="kicker">STEP 01</span><h2 id="seat-heading">Choose your seat</h2><p>Tap an available seat to select it.</p></div><span>01 / 02</span></div>
+    <div class="seat-legend"><span><i class="swatch free"></i> Available</span><span><i class="swatch taken"></i> Taken</span><span><i class="swatch chosen"></i> Selected</span></div>
+    <div class="seat-area">
+      <div class="bus-frame">
+        <div class="bus-front"><span>FRONT OF BUS</span><span aria-hidden="true">◉</span></div>
+        <div class="seat-grid" id="seat-map" data-capacity="{{ trip[2] }}" data-booked-seats='{{ booked_seats|tojson }}' aria-label="Select a bus seat">
+          <p class="seat-fallback">To select a seat without JavaScript, enter its number in the form below.</p>
+        </div>
+        <div class="bus-rear">REAR OF BUS</div>
+      </div>
+    </div>
+    <p class="seat-note">✓ Seats already booked are unavailable. Your selection appears in the form below.</p>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Book Ticket - RouteMate</title>
-    <style>
-        body { font-family: Arial; margin: 30px; }
-        input, button { padding: 8px; margin: 5px; }
-    </style>
-</head>
-<body>
+    <div class="separator"></div>
+    <div class="step-heading"><div><span class="kicker">STEP 02</span><h2>Passenger details</h2><p>Just a few details to complete your reservation.</p></div><span>02 / 02</span></div>
+    <form method="POST" id="booking-form" class="passenger-form">
+      <div class="form-grid">
+        <label class="input-group">Full name <span class="required">*</span><input type="text" id="name" name="name" placeholder="Enter your full name" autocomplete="name" required></label>
+        <label class="input-group">Phone number <span class="required">*</span><input type="tel" id="phone" name="phone" placeholder="Your phone number" autocomplete="tel" required></label>
+        <label class="input-group">Email address <small>(optional)</small><input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email"></label>
+        <label class="input-group">Selected seat <span class="required">*</span><input type="number" id="seat_number" name="seat_number" min="1" max="{{ trip[2] }}" placeholder="Choose above or enter number" required><small class="field-hint">You can also type the seat number.</small></label>
+      </div>
+      <div class="form-actions"><p>✓ Your contact details are used to manage this reservation.</p><button class="primary-button" type="submit">Confirm booking <span>→</span></button></div>
+    </form>
+  </section>
 
-<h1>RouteMate</h1>
-
-<a href="/">Home</a> |
-<a href="/my-bookings">My Bookings</a>
-
-<hr>
-
-<h2>Book Ticket</h2>
-
-{% for message in get_flashed_messages() %}
-    <p><b>{{ message }}</b></p>
-{% endfor %}
-
-<h3>Selected Bus</h3>
-
-<p>Bus Number: {{ trip[1] }}</p>
-<p>Route: {{ trip[3] }} to {{ trip[4] }}</p>
-<p>Date: {{ trip[5] }}</p>
-<p>Departure: {{ trip[6] }}</p>
-<p>Fare: Rs. {{ trip[7] }}</p>
-<p>Seat Capacity: {{ trip[2] }}</p>
-
-<p>
-    Booked Seats:
-    {{ booked_seats|join(', ') or 'None' }}
-</p>
-
-<hr>
-
-<h3>Passenger Details</h3>
-
-<form method="POST">
-
-    <p>
-        Name:
-        <input type="text" name="name" required>
-    </p>
-
-    <p>
-        Phone:
-        <input type="text" name="phone" required>
-    </p>
-
-    <p>
-        Email (Optional):
-        <input type="email" name="email">
-    </p>
-
-    <p>
-        Seat Number:
-        <input type="number" name="seat_number"
-               min="1" max="{{ trip[2] }}" required>
-    </p>
-
-    <button type="submit">Confirm Booking</button>
-
-</form>
-
-</body>
-</html>
+  <aside class="booking-aside">
+    <section class="surface trip-summary">
+      <div class="summary-heading"><h2>Your trip</h2><span>TRIP SUMMARY</span></div>
+      <div class="summary-bus"><div class="summary-icon">↗</div><div><strong>{{ trip[1] }}</strong><small>Bus service</small></div></div>
+      <div class="summary-path">
+        <div class="summary-stop"><i></i><div><small>DEPARTING FROM</small><strong>{{ trip[3] }}</strong></div></div>
+        <div class="summary-line"></div>
+        <div class="summary-stop"><i class="end"></i><div><small>ARRIVING AT</small><strong>{{ trip[4] }}</strong></div></div>
+      </div>
+      <div class="summary-row"><span>Travel date</span><strong>{{ trip[5] }}</strong></div>
+      <div class="summary-row"><span>Departure</span><strong>{{ trip[6] }}</strong></div>
+      <div class="summary-row"><span>Seat capacity</span><strong>{{ trip[2] }}</strong></div>
+      <div class="summary-total"><span>Fare per seat</span><strong>₹{{ trip[7] }}</strong></div>
+      <p class="summary-caption">Final booking depends on live seat availability.</p>
+    </section>
+    <div class="aside-help"><span>✦</span><div><strong>Plans changed?</strong><p>Look up and cancel a reservation in My bookings.</p><a href="{{ url_for('my_bookings') }}">Manage my bookings →</a></div></div>
+  </aside>
+</div>
+{% endblock %}

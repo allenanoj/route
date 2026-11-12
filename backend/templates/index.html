@@ -1,86 +1,71 @@
+{% extends "base.html" %}
+{% block title %}RouteMate — Make every journey count{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <span class="eyebrow"><span class="eyebrow-dot"></span>A BETTER WAY TO TRAVEL</span>
+      <h1>Good journeys<br>start <em>right here.</em></h1>
+      <p>Find your next ride, choose the perfect seat and hit the road with confidence. Your journey starts with RouteMate.</p>
+      <div class="hero-perks"><span>✓ Simple booking</span><span>✓ Pick your seat</span><span>✓ Easy trip management</span></div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <span class="orbit orbit-a"></span><span class="orbit orbit-b"></span>
+      <div class="trip-illustration">
+        <div class="illustration-top"><span><i></i> YOUR NEXT JOURNEY</span><span>✦</span></div>
+        <div class="illustration-route">
+          <div><small>DEPARTURE</small><strong>Anywhere</strong><span>Your adventure starts</span></div>
+          <div class="illustration-arrow">⟶</div>
+          <div><small>DESTINATION</small><strong>Everywhere</strong><span>Make it memorable</span></div>
+        </div>
+        <div class="illustration-bottom">THE OPEN ROAD AWAITS <span>↗</span></div>
+      </div>
+      <div class="floating-note"><span>✓</span><div><strong>Ready to roll?</strong><small>Make your next trip happen.</small></div></div>
+    </div>
+  </div>
+</section>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>RouteMate</title>
-    <style>
-        body { font-family: Arial; margin: 30px; }
-        input, button { padding: 8px; margin: 5px; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid gray; padding: 10px; }
-    </style>
-</head>
-<body>
-
-<h1>RouteMate</h1>
-<p>Bus Reservation System</p>
-
-<a href="/">Home</a> |
-<a href="/my-bookings">My Bookings</a>
-
-<hr>
-
-{% for message in get_flashed_messages() %}
-    <p><b>{{ message }}</b></p>
-{% endfor %}
-
-<h2>Search Buses</h2>
-
-<form action="/" method="GET">
-    <input type="hidden" name="search" value="1">
-
-    <input type="text" name="source"
-           placeholder="Source" value="{{ source }}" required>
-
-    <input type="text" name="destination"
-           placeholder="Destination"
-           value="{{ destination }}" required>
-
-    <input type="date" name="date"
-           value="{{ travel_date }}" required>
-
-    <button type="submit">Search Buses</button>
-</form>
+<div class="container search-overlap" id="search">
+  <section class="search-box" aria-labelledby="search-heading">
+    <div class="search-box-head"><div><span class="kicker">FIND YOUR NEXT RIDE</span><h2 id="search-heading">Where to next?</h2></div><p>Just a few details, and you're on your way.</p></div>
+    <form method="GET" action="{{ url_for('home') }}" class="search-form">
+      <input type="hidden" name="search" value="1">
+      <label class="search-field" for="source"><span>Leaving from</span><div><span class="field-icon" aria-hidden="true">◎</span><input type="text" id="source" name="source" placeholder="Departure city" autocomplete="address-level2" value="{{ source }}" required></div></label>
+      <button type="button" class="swap-button" data-swap title="Swap cities" aria-label="Swap departure and destination">⇄</button>
+      <label class="search-field" for="destination"><span>Going to</span><div><span class="field-icon" aria-hidden="true">⌖</span><input type="text" id="destination" name="destination" placeholder="Destination city" autocomplete="off" value="{{ destination }}" required></div></label>
+      <label class="search-field date-field" for="date"><span>Travel date</span><div><span class="field-icon" aria-hidden="true">▦</span><input type="date" id="date" name="date" value="{{ travel_date }}" data-future-date required></div></label>
+      <button class="primary-button search-submit" type="submit">Search buses <span aria-hidden="true">→</span></button>
+    </form>
+  </section>
+</div>
 
 {% if searched %}
-
-<h2>Available Buses</h2>
-
-{% if trips %}
-
-<table>
-    <tr>
-        <th>Bus Number</th>
-        <th>Source</th>
-        <th>Destination</th>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Fare</th>
-        <th>Action</th>
-    </tr>
-
+<section class="container results" aria-labelledby="result-heading">
+  <div class="section-heading"><div><span class="kicker">YOUR ROUTE OPTIONS</span><h2 id="result-heading">Available buses <span class="count">{{ trips|length }}</span></h2><p>{{ source }} → {{ destination }} · {{ travel_date }}</p></div><a class="subtle-link" href="#search">Edit search ↗</a></div>
+  {% if trips %}
+  <div class="results-list">
     {% for trip in trips %}
-    <tr>
-        <td>{{ trip[1] }}</td>
-        <td>{{ trip[3] }}</td>
-        <td>{{ trip[4] }}</td>
-        <td>{{ trip[5] }}</td>
-        <td>{{ trip[6] }}</td>
-        <td>Rs. {{ trip[7] }}</td>
-        <td>
-            <a href="{{ url_for('book', trip_id=trip[0]) }}">
-                <button>Select Bus</button>
-            </a>
-        </td>
-    </tr>
+    <article class="ride-card">
+      <div class="ride-icon" aria-hidden="true">↗</div>
+      <div class="ride-id"><small>BUS SERVICE</small><strong>{{ trip[1] }}</strong><span>Seats: {{ trip[2] }}</span></div>
+      <div class="ride-route"><div><small>FROM</small><strong>{{ trip[3] }}</strong></div><span class="route-arrow" aria-hidden="true">⟶</span><div><small>TO</small><strong>{{ trip[4] }}</strong></div></div>
+      <div class="ride-time"><small>DEPARTURE</small><strong>{{ trip[6] }}</strong><span>{{ trip[5] }}</span></div>
+      <div class="ride-fare"><small>FARE / SEAT</small><strong>₹{{ trip[7] }}</strong><a class="primary-button" href="{{ url_for('book', trip_id=trip[0]) }}">Choose seat <span aria-hidden="true">↗</span></a></div>
+    </article>
     {% endfor %}
-</table>
-
+  </div>
+  {% else %}
+  <div class="empty-state"><div class="empty-art" aria-hidden="true">⌕</div><h3>No buses found this time</h3><p>Try a different departure city, destination or travel date.</p><a class="primary-button" href="#search">Try another search →</a></div>
+  {% endif %}
+</section>
 {% else %}
-<p>No buses found for this search.</p>
+<section class="container why">
+  <div class="why-heading"><span class="kicker">MADE FOR THE JOURNEY</span><h2>Everything you need.<br><em>Nothing you don't.</em></h2></div>
+  <div class="feature-grid">
+    <article class="feature"><div class="feature-icon lavender">↗</div><h3>Find your perfect ride</h3><p>Search routes and departure times in one simple place.</p></article>
+    <article class="feature"><div class="feature-icon peach">▦</div><h3>Pick your own seat</h3><p>See the available seats before you confirm your booking.</p></article>
+    <article class="feature"><div class="feature-icon mint">✓</div><h3>Stay in control</h3><p>Find your bookings and cancel them when plans change.</p></article>
+  </div>
+</section>
 {% endif %}
-
-{% endif %}
-
-</body>
-</html>
+{% endblock %}

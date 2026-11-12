@@ -1,102 +1,14 @@
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>My Bookings - RouteMate</title>
-    <style>
-        body { font-family: Arial; margin: 30px; }
-        input, button { padding: 8px; margin: 5px; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid gray; padding: 10px; }
-    </style>
-</head>
-<body>
-
-<h1>RouteMate</h1>
-
-<a href="/">Home</a> |
-<a href="/my-bookings">My Bookings</a>
-
-<hr>
-
-<h2>My Bookings</h2>
-
-{% for message in get_flashed_messages() %}
-    <p><b>{{ message }}</b></p>
-{% endfor %}
-
-<form method="POST">
-
-    <input type="text" name="name"
-           placeholder="Passenger Name"
-           value="{{ name }}" required>
-
-    <input type="text" name="contact"
-           placeholder="Phone Number or Email"
-           value="{{ contact }}" required>
-
-    <button type="submit">View Bookings</button>
-
-</form>
-
+{% extends 'base.html' %}
+{% block title %}My bookings — RouteMate{% endblock %}
+{% block content %}
+<section class="subpage-header"><div class="container"><nav class="breadcrumb" aria-label="Breadcrumb"><a href="{{ url_for('home') }}">Find a bus</a><span>›</span><span>My bookings</span></nav><span class="section-kicker">ALL YOUR JOURNEYS IN ONE PLACE</span><h1>Your trips, sorted.</h1><p>Find your reservations, check the details, and stay in control of your plans.</p></div></section>
+<div class="container bookings-container"><section class="paper-card lookup-panel"><div class="lookup-head"><div class="lookup-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18m-13 4h4"/></svg></div><div><h2>Find your bookings</h2><p>Enter the same details used when you booked your ticket.</p></div></div><form method="POST" class="lookup-form"><div class="form-field"><label for="name">Passenger name</label><input id="name" name="name" type="text" value="{{ name }}" autocomplete="name" placeholder="Your full name" required></div><div class="form-field"><label for="contact">Phone number or email</label><input id="contact" name="contact" type="text" value="{{ contact }}" placeholder="Your booking contact" required></div><button type="submit" class="primary-button lookup-button">Find bookings <span>→</span></button></form></section>
 {% if searched %}
-
-<h2>Booking History</h2>
-
+<section class="booking-history" aria-labelledby="history-title"><div class="section-topline"><div><span class="section-kicker">YOUR RESERVATIONS</span><h2 id="history-title">Booking history <span class="result-count">{{ bookings|length }}</span></h2></div></div>
 {% if bookings %}
-
-<table>
-    <tr>
-        <th>Booking ID</th>
-        <th>Name</th>
-        <th>Bus</th>
-        <th>Route</th>
-        <th>Date</th>
-        <th>Seat</th>
-        <th>Status</th>
-        <th>Action</th>
-    </tr>
-
-    {% for booking in bookings %}
-    <tr>
-        <td>{{ booking[0] }}</td>
-        <td>{{ booking[1] }}</td>
-        <td>{{ booking[2] }}</td>
-        <td>{{ booking[3] }} to {{ booking[4] }}</td>
-        <td>{{ booking[5] }}</td>
-        <td>{{ booking[6] }}</td>
-        <td>{{ booking[7] }}</td>
-
-        <td>
-            {% if booking[7] == 'BOOKED' %}
-            <form method="POST">
-
-                <input type="hidden" name="action"
-                       value="cancel">
-
-                <input type="hidden" name="booking_id"
-                       value="{{ booking[0] }}">
-
-                <input type="hidden" name="name"
-                       value="{{ name }}">
-
-                <input type="hidden" name="contact"
-                       value="{{ contact }}">
-
-                <button type="submit">Cancel</button>
-            </form>
-            {% endif %}
-        </td>
-
-    </tr>
-    {% endfor %}
-</table>
-
-{% else %}
-<p>No bookings found.</p>
-{% endif %}
-
-{% endif %}
-
-</body>
-</html>
+<div class="booking-list">{% for booking in bookings %}<article class="history-card"><div class="history-top"><span class="booking-id">BOOKING #{{ booking[0] }}</span><span class="status-pill {% if booking[7] == 'BOOKED' %}status-booked{% else %}status-cancelled{% endif %}"><i></i>{{ booking[7] }}</span></div><div class="history-body"><div class="history-trip"><small>YOUR ROUTE</small><h3>{{ booking[3] }} <span>→</span> {{ booking[4] }}</h3><span class="history-bus">{{ booking[2] }}</span></div><div class="history-item"><small>TRAVEL DATE</small><strong>{{ booking[5] }}</strong></div><div class="history-item"><small>SEAT</small><strong>{{ booking[6] }}</strong></div><div class="history-action">{% if booking[7] == 'BOOKED' %}<form method="POST" data-confirm-cancel><input type="hidden" name="action" value="cancel"><input type="hidden" name="booking_id" value="{{ booking[0] }}"><input type="hidden" name="name" value="{{ name }}"><input type="hidden" name="contact" value="{{ contact }}"><button type="submit" class="cancel-button">Cancel booking</button></form>{% else %}<span class="inactive-text">No action needed</span>{% endif %}</div></div></article>{% endfor %}</div>
+{% else %}<div class="empty-state"><div class="empty-icon">⌕</div><h3>No bookings found</h3><p>We couldn't find reservations with those details. Double-check your name and phone number or email, then try again.</p></div>{% endif %}
+</section>
+{% else %}<section class="bookings-tip"><span class="tip-icon">✦</span><div><h3>Have a trip coming up?</h3><p>Your active and past reservations will appear here as soon as you look them up.</p></div></section>{% endif %}
+</div>
+{% endblock %}

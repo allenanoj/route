@@ -39,15 +39,21 @@
   </section>
 </div>
 
-{% if searched %}
 <section class="container results" aria-labelledby="result-heading">
-  <div class="section-heading"><div><span class="kicker">YOUR ROUTE OPTIONS</span><h2 id="result-heading">Available buses <span class="count">{{ trips|length }}</span></h2><p>{{ source }} → {{ destination }} · {{ travel_date }}</p></div><a class="subtle-link" href="#search">Edit search ↗</a></div>
+  <div class="section-heading">
+    <div>
+      <span class="kicker">{% if searched %}YOUR ROUTE OPTIONS{% else %}EXPLORE UPCOMING JOURNEYS{% endif %}</span>
+      <h2 id="result-heading">{% if searched %}Available buses{% else %}All available buses{% endif %} <span class="count">{{ trips|length }}</span></h2>
+      <p>{% if searched %}{{ source }} → {{ destination }} · {{ travel_date }}{% else %}Browse upcoming trips, then use the search above to narrow your options.{% endif %}</p>
+    </div>
+    {% if searched %}<a class="subtle-link" href="#search">Edit search ↗</a>{% endif %}
+  </div>
   {% if trips %}
   <div class="results-list">
     {% for trip in trips %}
     <article class="ride-card">
       <div class="ride-icon" aria-hidden="true">↗</div>
-      <div class="ride-id"><small>BUS SERVICE</small><strong>{{ trip[1] }}</strong><span>Seats: {{ trip[2] }}</span></div>
+      <div class="ride-id"><small>BUS SERVICE</small><strong>{{ trip[1] }}</strong><span>{{ trip[8] }} of {{ trip[2] }} seats available</span></div>
       <div class="ride-route"><div><small>FROM</small><strong>{{ trip[3] }}</strong></div><span class="route-arrow" aria-hidden="true">⟶</span><div><small>TO</small><strong>{{ trip[4] }}</strong></div></div>
       <div class="ride-time"><small>DEPARTURE</small><strong>{{ trip[6] }}</strong><span>{{ trip[5] }}</span></div>
       <div class="ride-fare"><small>FARE / SEAT</small><strong>₹{{ trip[7] }}</strong><a class="primary-button" href="{{ url_for('book', trip_id=trip[0]) }}">Choose seat <span aria-hidden="true">↗</span></a></div>
@@ -55,14 +61,21 @@
     {% endfor %}
   </div>
   {% else %}
-  <div class="empty-state"><div class="empty-art" aria-hidden="true">⌕</div><h3>No buses found this time</h3><p>Try a different departure city, destination or travel date.</p><a class="primary-button" href="#search">Try another search →</a></div>
+  <div class="empty-state"><div class="empty-art" aria-hidden="true">⌕</div>
+    {% if searched %}
+    <h3>No buses found this time</h3><p>Try a different departure city, destination or travel date.</p>
+    <a class="primary-button" href="#search">Try another search →</a>
+    {% else %}
+    <h3>No upcoming buses available</h3><p>New trips will appear here as soon as they are added.</p>
+    {% endif %}
+  </div>
   {% endif %}
 </section>
-{% else %}
+{% if not searched %}
 <section class="container why">
   <div class="why-heading"><span class="kicker">MADE FOR THE JOURNEY</span><h2>Everything you need.<br><em>Nothing you don't.</em></h2></div>
   <div class="feature-grid">
-    <article class="feature"><div class="feature-icon lavender">↗</div><h3>Find your perfect ride</h3><p>Search routes and departure times in one simple place.</p></article>
+    <article class="feature"><div class="feature-icon lavender">↗</div><h3>Find your perfect ride</h3><p>Browse routes and search departure times in one simple place.</p></article>
     <article class="feature"><div class="feature-icon peach">▦</div><h3>Pick your own seat</h3><p>See the available seats before you confirm your booking.</p></article>
     <article class="feature"><div class="feature-icon mint">✓</div><h3>Stay in control</h3><p>Find your bookings and cancel them when plans change.</p></article>
   </div>

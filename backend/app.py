@@ -23,7 +23,7 @@ def get_db():
     )
 
 
-# Home page - Search buses
+# Home page - List upcoming available buses, or filter by search
 @app.route("/")
 def home():
     trips = []
@@ -33,30 +33,47 @@ def home():
     destination = request.args.get("destination", "").strip()
     travel_date = request.args.get("date", "")
 
-    if searched:
-        if source and destination and travel_date:
-            conn = get_db()
-            cur = conn.cursor()
+    if searched and not (source and destination and travel_date):
+        flash("Please fill in all search fields.")
+    else:
+        conn = get_db()
+        cur = conn.cursor()
 
-            cur.execute("""
+        try:
+            # Count only confirmed bookings: cancelled seats become available again.
+            sql = """
                 SELECT t.trip_id, b.bus_number, b.capacity,
                        r.source, r.destination, t.travel_date,
-                       t.departure_time, t.fare
+                       t.departure_time, t.fare,
+                       b.capacity - COUNT(bk.booking_id) AS seats_left
                 FROM trips t
                 JOIN buses b ON t.bus_id = b.bus_id
                 JOIN routes r ON t.route_id = r.route_id
-                WHERE LOWER(r.source) = LOWER(%s)
-                  AND LOWER(r.destination) = LOWER(%s)
-                  AND t.travel_date = %s
-                  AND t.travel_date >= CURRENT_DATE
-                ORDER BY t.departure_time
-            """, (source, destination, travel_date))
+                LEFT JOIN bookings bk
+                    ON bk.trip_id = t.trip_id AND bk.status = 'BOOKED'
+                WHERE t.travel_date >= CURRENT_DATE
+            """
+            params = []
 
+            if searched:
+                sql += """
+                    AND LOWER(r.source) = LOWER(%s)
+                    AND LOWER(r.destination) = LOWER(%s)
+                    AND t.travel_date = %s
+                """
+                params = [source, destination, travel_date]
+
+            sql += """
+                GROUP BY t.trip_id, b.bus_id, r.route_id
+                HAVING b.capacity > COUNT(bk.booking_id)
+                ORDER BY t.travel_date, t.departure_time
+            """
+
+            cur.execute(sql, params)
             trips = cur.fetchall()
+        finally:
             cur.close()
             conn.close()
-        else:
-            flash("Please fill in all search fields.")
 
     return render_template("index.html",
                            trips=trips,

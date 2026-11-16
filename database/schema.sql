@@ -3,7 +3,8 @@
 CREATE TABLE passengers (
     passenger_id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    phone VARCHAR(15) NOT NULL
+    phone VARCHAR(15) NOT NULL,
+    email VARCHAR(150)
 );
 
 -- 2. Bus table
